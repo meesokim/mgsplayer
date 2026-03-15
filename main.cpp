@@ -13,6 +13,42 @@ extern "C" {
 
 #ifdef _WIN32
 #include <windows.h>
+#include <shlobj.h>
+
+// Function to setup file association on Windows
+void setupFileAssociation() {
+    char exePath[MAX_PATH];
+    GetModuleFileNameA(NULL, exePath, MAX_PATH);
+
+    const char* ext = ".mgs";
+    const char* progId = "MGSPlayer.File";
+    const char* description = "MSX Music File (.mgs)";
+
+    HKEY hKey;
+    // 1. Create .mgs extension key
+    if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\.mgs", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+        RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)progId, strlen(progId) + 1);
+        RegCloseKey(hKey);
+    }
+
+    // 2. Create MGSPlayer.File key
+    char command[MAX_PATH + 10];
+    sprintf(command, "\"%s\" \"%%1\"", exePath);
+
+    if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\MGSPlayer.File", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+        RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)description, strlen(description) + 1);
+        
+        HKEY hCmdKey;
+        if (RegCreateKeyExA(hKey, "shell\\open\\command", 0, NULL, 0, KEY_WRITE, NULL, &hCmdKey, NULL) == ERROR_SUCCESS) {
+            RegSetValueExA(hCmdKey, "", 0, REG_SZ, (const BYTE*)command, strlen(command) + 1);
+            RegCloseKey(hCmdKey);
+        }
+        RegCloseKey(hKey);
+    }
+
+    // Notify Windows that file associations have changed
+    SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL);
+}
 #else
 #include <iconv.h>
 #endif
@@ -110,6 +146,7 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
     // Set console output to UTF-8 for Windows
     SetConsoleOutputCP(65001);
+    setupFileAssociation();
 #endif
     SDL_SetMainReady();
     bool debugMode = false;
@@ -125,6 +162,7 @@ int main(int argc, char* argv[]) {
 
     if (filename.empty()) {
         std::cerr << "Usage: " << argv[0] << " [-debug] <filename.mgs>" << std::endl;
+        std::cerr << "On Windows, .mgs files are automatically associated with this player on first run." << std::endl;
         return 1;
     }
 
