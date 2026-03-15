@@ -146,7 +146,10 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
     // Set console output to UTF-8 for Windows
     SetConsoleOutputCP(65001);
-    setupFileAssociation();
+    if (argc == 1) {
+        setupFileAssociation();
+        std::cout << "File association for .mgs files has been registered." << std::endl;
+    }
 #endif
     SDL_SetMainReady();
     bool debugMode = false;
