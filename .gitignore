@@ -1,0 +1,24 @@
+# Build directories
+build/
+build-win/
+dist-win/
+
+# Binary files
+mgsplayer
+mgsplayer.exe
+*.dll
+
+# Debug files
+debug_output.wav
+
+# Music files (Excluded from repository)
+*.mgs
+*.MGS
+
+# Library artifacts
+SDL2-2.30.0/
+SDL2-devel-2.30.0-mingw.tar.gz
+
+# IDE files
+.vscode/
+.idea/
