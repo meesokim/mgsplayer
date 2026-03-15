@@ -153,19 +153,24 @@ int main(int argc, char* argv[]) {
 #endif
     SDL_SetMainReady();
     bool debugMode = false;
+    bool wavOutput = false;
     std::string filename;
 
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "-debug") {
+        std::string arg = argv[i];
+        if (arg == "-debug") {
             debugMode = true;
+            wavOutput = true;
+        } else if (arg == "-wav") {
+            wavOutput = true;
         } else {
-            filename = argv[i];
+            filename = arg;
         }
     }
 
     if (filename.empty()) {
-        std::cerr << "Usage: " << argv[0] << " [-debug] <filename.mgs>" << std::endl;
-        std::cerr << "On Windows, .mgs files are automatically associated with this player on first run." << std::endl;
+        std::cerr << "Usage: " << argv[0] << " [-debug | -wav] <filename.mgs>" << std::endl;
+        std::cerr << "On Windows, run without arguments to register .mgs file association." << std::endl;
         return 1;
     }
 
@@ -211,10 +216,12 @@ int main(int argc, char* argv[]) {
     }
 
     // Open debug WAV file
-    wavFile.open("debug_output.wav", std::ios::binary);
-    if (wavFile.is_open()) {
-        WAVHeader dummyHeader;
-        wavFile.write(reinterpret_cast<char*>(&dummyHeader), sizeof(WAVHeader));
+    if (wavOutput) {
+        wavFile.open("debug_output.wav", std::ios::binary);
+        if (wavFile.is_open()) {
+            WAVHeader dummyHeader;
+            wavFile.write(reinterpret_cast<char*>(&dummyHeader), sizeof(WAVHeader));
+        }
     }
 
     // Initialize KSSPLAY engine
