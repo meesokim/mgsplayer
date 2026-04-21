@@ -162,8 +162,10 @@ static Uint32 kmz80_fetch_im0(KMZ80_CONTEXT *context) {
 }
 
 void kmz80_reset_common(KMZ80_CONTEXT *context) {
-	B = C = D = E = F = H = L = A = F = IXH = IXL = IYH = IYL = 0;
-	R = R7 = I = IFF1 = IFF2 = IMODE = NMIREQ = INTREQ = HALTED = STATE = FDMG = 0;
+	A = 0; F = 0; B = 0; C = 0; D = 0; E = 0; H = 0; L = 0;
+	IXH = 0; IXL = 0; IYH = 0; IYL = 0;
+	R = 0; R7 = 0; IFF1 = 0; IFF2 = 0; IMODE = 0;
+	NMIREQ = 0; INTREQ = 0; HALTED = 0; STATE = 0; FDMG = 0;
 	M1CYCLE = 0;
 	MEMCYCLE = 3;
 	IOCYCLE = 4;
@@ -1209,10 +1211,12 @@ Uint32 kmz80_exec(KMZ80_CONTEXT *context, Uint32 cycles)
 					break;
 				case 4:	/* VECTOR INT for special */
 					IFF2 = IFF1 = 0;
+					/* fallthrough */
 				case 5:	/* VECTOR CALL for special */
 					SP = RTO16(SP - 2);
 					MEMWRITE(SP, RTO8(PC));
 					MEMWRITE(RTO16(SP + 1), RTO8(PC >> 8));
+					/* fallthrough */
 				case 6:	/* VECTOR JP for special */
 					{
 						Uint32 i;

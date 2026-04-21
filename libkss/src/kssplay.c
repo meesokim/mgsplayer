@@ -684,7 +684,7 @@ void KSSPLAY_set_opll_patch(KSSPLAY *kssplay, uint8_t *data) {
     OPLL_setPatch(kssplay->vm->opll, data);
 }
 
-void KSSPLAY_set_channel_mask(KSSPLAY *kssplay, uint32_t device, uint32_t mask) {
+void KSSPLAY_set_channel_mask(KSSPLAY *kssplay, KSS_DEVICE device, uint32_t mask) {
   switch (device) {
   case KSS_DEVICE_PSG:
     if (kssplay->vm->psg) {
@@ -705,6 +705,8 @@ void KSSPLAY_set_channel_mask(KSSPLAY *kssplay, uint32_t device, uint32_t mask) 
     if (kssplay->vm->opl) {
       OPL_setMask(kssplay->vm->opl, mask);
     }
+    break;
+  default:
     break;
   }
 }

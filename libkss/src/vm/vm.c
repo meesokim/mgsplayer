@@ -275,8 +275,8 @@ void VM_set_OPLL_type(VM *vm, uint32_t opll_type) {
     OPLL_reset_patch(vm->opll, OPLL_VRC7_TONE);
   else if (opll_type == VM_OPLL_281B)
     OPLL_reset_patch(vm->opll, OPLL_281B_TONE);
-  else
-    ;
+  else {
+  }
   vm->opll_type = opll_type;
 }
 
@@ -317,7 +317,7 @@ void VM_reset(VM *vm, uint32_t clock, uint32_t init_adr, uint32_t vsync_adr, dou
   vm->vsync_adr = vsync_adr;
   kmevent_init(&vm->kme);
   vm->vsync_id = kmevent_alloc(&vm->kme);
-  kmevent_setevent(&vm->kme, vm->vsync_id, vsync, vm);
+  kmevent_setevent(&vm->kme, vm->vsync_id, (void (*)(void))vsync, vm);
   vm->context.kmevent = &vm->kme;
   VM_set_clock(vm, clock, vsync_freq);
 }
